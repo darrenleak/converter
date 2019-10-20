@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html>
+	<body>
+		<fieldset>
+				<label>Price: </label>
+				<input type="text" id="itemPrice" onkeyup="priceChange(this)"/>
+				<br/>
+				<label>Weight: </label>
+				<input type="text" id="itemWeight" onkeyup="weighChange(this)"/>
+				<br/>
+				Unit Type: <button onClick="changeUnitTypeTo('g')">Grams</button><button onclick="changeUnitTypeTo('kg')">Kilograms</button>
+		
+				<br/>
+				Cost per gram: <input type="text" id="costPerGram"/>
+				<br/>
+				Cost per kilo: <input type="text" id="costPerKilo"/>
+		</fieldset>
+
+		<fieldset>
+			Download Speed: <input type="text" id="downloadSpeedTextField" onkeyup="downloadSpeedChange(this)"/>
+			<br/>
+			Download Size: <input type="text" id="downloadSizeTextField" onkeyup="downloadSizeChange(this)"/>
+			<br/>
+			Download in <button onclick="changeSizeType('MB')">Megabytes</button><button onclick="changeSizeType('GB')">Gigabytes</button>
+			<br/>
+			Download time: <input type="text" id="downloadTimeTextField"/>
+		</fieldset>
+	</body>
+
+	<script>
+		////////////////////////////////////////////////////////////
+		// Unit cost logic
+		////////////////////////////////////////////////////////////
+		// Tell JavaScript about the Cost per gram and Cost per kilo text fields so that we 
+		// can output to them later on
+		var costPerGramTextField = document.getElementById("costPerGram")
+		var costPerKiloTextField = document.getElementById("costPerKilo")
+
+		// UI input/change handling
+		var price = 0
+		var weight = 0
+		var unitType = "g"
+
+		function priceChange(element) {
+			price = element.value
+			calculate()
+		}
+
+		function weighChange(element) {
+			weight = element.value
+			calculate()
+		}
+
+		function changeUnitTypeTo(unitType) {
+			unitType = unitType
+			calculate()
+		}
+
+		function calculate() {
+			let unitCost = costPerUnit(unitType, price, weight)
+			let gramCost = 0
+			let kiloCost = 0
+
+			if (unitType == "g") {
+				gramCost = unitCost
+				kiloCost = gramCost * 1000
+			} else {
+				gramCost = gramCost / 1000
+				kiloCost = unitCost
+			}
+
+			costPerGramTextField.value = gramCost
+			costPerKiloTextField.value = kiloCost
+		}
+
+		function costPerUnit(unit, currentPrice, weight) {
+			let weightInGrams = 0
+			
+			// Convert weight to grams if unit type is kg
+			if (unit == "kg") {
+				weightInGrams = weight * 1000
+			} else {
+				weightInGrams = weight
+			}
+
+			let pricePerUnit = currentPrice / weightInGrams
+
+			return pricePerUnit
+		}
+
+		////////////////////////////////////////////////////////////
+		// Download logic
+		////////////////////////////////////////////////////////////
+		var downloadSpeedTextField = document.getElementById("downloadSpeedTextField")
+		var downloadSizeTextField = document.getElementById("downloadSizeTextField")
+		var downloadTimeTextField = document.getElementById("downloadTimeTextField")
+
+		var sizeType = "MB"
+		var downloadSpeed = 0
+		var downloadSize = 0
+		var downloadMegabits = 0 // We will convert the download size to megabits
+
+		function downloadSpeedChange(element) {
+			downloadSpeed = element.value
+			sizeCalculation()
+		}
+
+		function downloadSizeChange(element) {
+			downloadSize = element.value
+			sizeCalculation()
+		}
+
+		function changeSizeType(newSizeType) {
+			sizeType = newSizeType
+			sizeCalculation()
+		}
+
+		function sizeCalculation() {
+			if (sizeType === "GB") {
+				downloadMegabits = downloadSize * 8000
+			} else if (sizeType === "MB") {
+				downloadMegabits = downloadSize * 8
+			}
+
+			downloadTimeTextField.value = downloadTimeCalculation(downloadMegabits, downloadSpeed)
+		}
+
+		function downloadTimeCalculation(downloadSizeMegabits, internetSpeedMegabitsPerSecond) {
+			const secondsToDownload = downloadMegabits / internetSpeedMegabitsPerSecond
+
+			let hours = Math.floor((secondsToDownload / 60) / 60)
+			let minutes = Math.floor((secondsToDownload - (hours * 3600)) / 60)
+			let seconds = (secondsToDownload - (minutes * 60))
+
+			console.log("Mins ", minutes)
+			console.log("Seconds: ", seconds)
+
+			let time =  hours + ":" + minutes + ":" + seconds
+
+			return time
+		}
+
+	</script>
+</html>
